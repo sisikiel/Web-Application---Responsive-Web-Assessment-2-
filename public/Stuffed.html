@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stuffed - into the world of dreams</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/Assets/logo_image.png">
+
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- LOADING SCREEN -->
+    <div id="app-loader">
+        <div class="loader-content">
+            <img src="Assets/logo.gif" alt="Loading" class="loader-logo">
+            <p>Loading into the world of dreams...</p>
+        </div>
+    </div>
+
+    <!-- Parallax Background -->
+    <section class="parallax-background">
+        <div class="parallax-layer layer-1"></div>
+
+        <div class="parallax-layer layer-2">
+            <img src="Assets/cats.png" class="cats-img" alt="">
+        </div>
+        <div class="parallax-layer layer-3">
+            <img src="Assets/stars.png" class="stars-img" alt="">
+        </div>
+        <div class="parallax-layer layer-4"></div>
+
+    </section>
+
+    <!-- Main SPA -->
+    <main class="main">
+
+        <!-- Book Wrapper -->
+        <div class="book" id="book">
+
+            <!-- Book Cover -->
+            <div class="book-cover" id="bookCover"></div>
+
+            <!-- Inner Book -->
+            <div class="book-inner">
+
+                <!-- LEFT PAGE -->
+                <div class="book-page left-page">
+
+                    <nav class="nav-buttons" aria-label="Main Navigation">
+                        <ul>
+
+                            <li class="nav-btn-wrapper">
+                                <button class="nav-btn active" data-section="home"
+                                    style="background-image: url('Assets/Button_Home.png')"></button>
+                                <span class="nav-label">Home</span>
+                            </li>
+
+                            <li class="nav-btn-wrapper">
+                                <button class="nav-btn" data-section="about"
+                                    style="background-image: url('Assets/Button_About.png')"></button>
+                                <span class="nav-label">About</span>
+                            </li>
+
+                            <li class="nav-btn-wrapper">
+                                <button class="nav-btn" data-section="characters"
+                                    style="background-image: url('Assets/Button_Characters.png')"></button>
+                                <span class="nav-label">Characters</span>
+                            </li>
+
+                            <li class="nav-btn-wrapper">
+                                <button class="nav-btn" data-section="dream"
+                                    style="background-image: url('Assets/Button_Dream.png')"></button>
+                                <span class="nav-label">Dream</span>
+                            </li>
+
+                            <li class="nav-btn-wrapper">
+                                <button class="nav-btn" data-section="download"
+                                    style="background-image: url('Assets/Button_Download.png')"></button>
+                                <span class="nav-label">Download</span>
+                            </li>
+
+                            <li class="nav-btn-wrapper">
+                                <button class="nav-btn" data-section="profile"
+                                    style="background-image: url('Assets/Button_Profile.png')"></button>
+                                <span class="nav-label">Profile</span>
+                            </li>
+
+                        </ul>
+                    </nav>
+
+                </div>
+
+                <!-- RIGHT PAGE -->
+                <div class="book-page right-page content-box" id="contentBox">
+                    <div class="box-content" id="boxContent"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="scripts.js"></script>
+</body>
+</html>
