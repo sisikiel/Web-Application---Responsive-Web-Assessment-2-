@@ -418,7 +418,7 @@ const bearState = {
 };
 
 function resetBearCustomizer() {
-    bearState.base = "base_brown"; // or your default
+    bearState.base = "base_brown";
     bearState.ears = "";
     bearState.eyes = "";
     bearState.head = "";
@@ -721,5 +721,5 @@ window.addEventListener("load", () => {
 
     setTimeout(() => {
         loader.classList.add("hidden");
-    }, 4800); // slight delay feels smoother
+    }, 4800); 
 });
