@@ -410,7 +410,7 @@ body::-webkit-scrollbar {
 .bookmark-bar {
     position: absolute;
     top: 80px;
-    right: -90px;
+    right: -120px;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -812,17 +812,86 @@ body::-webkit-scrollbar {
     to { transform: scale(1); opacity: 1; }
 }
 
+
+/* General smooth transitions for interactive elements */
+* {
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Hover animations for images and previews */
+.bear-preview img,
+.character-image-frame img,
+.about-image-wrapper img {
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), 
+                box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bear-preview img:hover,
+.character-image-frame img:hover,
+.about-image-wrapper img:hover {
+    transform: scale(1.05) rotateZ(1deg);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+}
+
+/* Smoother book opening */
+.book.open .book-cover {
+    transition: transform 1.5s cubic-bezier(0.68,-0.55,0.265,1.55);
+}
+
+.book.open .book-inner {
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+/* Smoother nav button hover */
+.nav-btn {
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), 
+                background-color 0.4s ease;
+}
+
+@keyframes gentleFloat {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-6px) scale(1); }
+    100% { transform: translateY(0) scale(1); }
+}
+
+.section-home,
+.about-section,
+.characters-section,
+.section-dream,
+.section-download,
+.section-profile {
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+
+@keyframes fadeInSmooth {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Bear customization buttons hover */
+.bear-options button,
+.option-row button {
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), 
+                background-color 0.35s ease;
+}
+
+.bear-options button:hover,
+.option-row button:hover {
+    transform: scale(1.08) rotateZ(1deg);
+}
+
+
+/* === MEDIA QUERIES === */
 .section-dream .dream-section {
     position: relative; /* necessary for absolute positioning of bookmarks */
 }
 .section-characters {
     position: relative; /* necessary for absolute positioning of character tabs */
 }
-/* === MEDIA QUERIES === */
 
 /* Tablet screens */
 @media (max-width: 900px) {
-
     .book-wrapper {
         transform: scale(0.9);
         transform-origin: center top;
@@ -834,7 +903,10 @@ body::-webkit-scrollbar {
         max-height: 85vh;
         display: flex;
         align-items: stretch;
+        overflow-y: hidden;
+        overflow: visible;
     }
+
 
     .book-cover,
     .book-inner {
@@ -845,14 +917,16 @@ body::-webkit-scrollbar {
         height: 90%;
     }
 
-
     .left-page .nav-container {
         margin-top: auto;
+        margin: 10px;
         flex-shrink: 0;
     }
-    
 
     /* About section */
+    .about-section{
+        width: 305px;
+    }
     .about-section p {
         font-size: clamp(12px, 1.8vw, 14px);
         line-height: 1.0;
@@ -884,7 +958,7 @@ body::-webkit-scrollbar {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    right: -80px;
+    right: -120px;
     }
 
     .character-tab {
@@ -948,6 +1022,7 @@ body::-webkit-scrollbar {
     }
 
     .bear-tab.active { background: #4b1fa6; }
+
     /* Profile section */
     .profile-btn {
         padding: 6px 12px;
@@ -957,164 +1032,229 @@ body::-webkit-scrollbar {
     }
 }
 
-
-/* Mobile screens */
+/* === MOBILE: NOTEPAD MODE === */
 @media (max-width: 600px) {
+
+    /*Loading screen*/
+    .loader-content {
+        text-align: center;
+        animation: float 1.6s ease-in-out infinite;
+        font-size: 20px;
+        color: #111;
+    }
+
+    .loader-logo {
+        width: 330px;
+        margin-bottom: 16px;
+    }
+
+    /*parallax layers*/
     .cats-img {
         position: absolute;
-        top: 80px;
-        right: 30px;
-        width: 180px;  
+        top: 60px;
+        right: 50px;
+        width: 160px;  
         height: auto;
     }
     .stars-img {
         position: absolute;
         top: 0px;
-        left: 30px;
-        width: 145px;
+        left: 50px;
+        width: 120px;
         height: auto;
     }
-    
+    .layer-4{
+        width: 600px;
+        background-size: cover;
+    }
+    /* ---------- BOOK CONTAINER ---------- */
     .book {
-        width: 350px;
-        height: 470px;
-    }
-    .book-cover{
-        transform: scale(0.8) translateX(-40px);        
-    }
-    .book-inner {
-        transform: scale(0.8) translateX(-30px);
-    }
-
-    .book.open {
-        transform: translateX(90px) scale(0.9);
-        box-shadow: 0 40px 60px rgba(0,0,0,0.4);
-    }
-    .nav-btn{
-        width: 40px;
-        height: 40px;
-        gap: 5px;
-    }
-    .left-page{
-        max-height: 410px ;
-        transform: translateX(-60px);
-    }
-    .right-page {
-        max-width: 500px;
-        transform: translateX(-60px);
-    }
-
-    /*Home section fix*/
-    .home-header h2 {
-        font-size: 25px;
-        margin-bottom: 5px;
-    }
-
-    .home-subtitle {
-        font-size: 15px;
-        opacity: 0.85;
-        line-height: 1.2;
-    }
-
-    .home-body p {
-        font-size: 15px;
-        line-height: 1.2;
-        margin-bottom: 12px;
-    }
-
-    /*About section fix*/
-    .about-section {
+        width: 92vw;
+        max-width: 420px;
+        height: 640px;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
+        perspective: none !important;
+        transform: none !important;
+
+    }
+
+    .book * {
+        backface-visibility: visible !important;
+        transform: 1200px;
+    }
+
+    /* ---------- COVER ---------- */
+    .book-cover {
+        background-image: url("Assets/notepad_cover.png");
+        height: 100%; 
+        width: 100%;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 18px 18px 6px 6px;
+        flex-shrink: 0;
+
+        transform-origin: center top;
+        transition: transform 0.5s cubic-bezier(.22,1,.36,1);
+        z-index: 3;
+    }
+
+    /* UPWARD OPEN: only slide up (notepad look)*/
+    .book.open .book-cover {
+        transform: translateY(-580px);
+    }
+
+    .book.open .book-inner{
+        opacity: 1;
+        overflow-x: hidden;
+    }
+
+    /* ---------- NAVIGATION ---------- */
+    .nav-buttons {
+        display: flex;
+        justify-content: center;
+        padding: 10px 0px;
+        margin-top: 12px;
+        gap: 4px;   
+        margin-bottom: 0px;
+        z-index: 2;
+    }
+
+    .nav-btn {
+        width: 70px;
+        height: 70px;
+    }
+
+    .nav-label {
+        font-size: 14px;
+        line-height: 1;
+    }
+
+    /* ---------- INNER CONTENT ---------- */
+    .book-inner {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        opacity: 1;
+        background: #eef3ff;
+        border-radius: 0 0 18px 18px;
+        z-index: 1;
+    }
+
+    .book-page{
+        width: 100%;
         height: 100%;
-        width: 200px;
     }
-    .about-section p {
-        font-size: 12px;
-        line-height: 0.9;
+    .right-page {
+        width: 100%;
+        height: 85%;
+        border: none;
+        border-radius: 0;
+        overflow-y: hidden;
+        box-shadow:
+            0 8px 20px rgba(0,0,0,0.25),
+            inset 0 0 18px rgba(0,0,0,0.08);
     }
-    .about-image-wrapper img {
-        width: 290px;
-        height: 90px;
-        max-width: 100%;
-        border-radius: 12px;
-        box-shadow: 0 12px 25px rgba(0,0,0,0.2);
-        object-fit: contain;
-    }
-
-    /*Character Section fix*/
-    .character-image-frame {
-        width: 140px;
-        height: 100px;
+    .left-page{
+        width: 100%;
+        height: 15%;
+        border: none;
+        overflow-y: hidden;
+        overflow-x: hidden;
     }
 
-    /* Second image smaller */
+    .about-section{
+        width: fit-content;
+    }
+
+    /* Character Section fix */
+    .section-characters {
+        overflow-x: hidden;
+    }
+    .character-content h2{
+        font-size: 14px;
+        padding-bottom: 0px;
+    }
+    .character-content p{
+        padding-top: -5px;
+        font-size: 13px;
+        line-height: 0.8;
+    }
+
+    .character-tabs {
+        position: absolute;
+        top: -30px;
+        left: 15%;
+        display: flex;
+        flex-direction: row;
+        gap: 14px;
+        z-index: 10;
+    }
+
+    .character-tab {
+        padding: 12px 18px;
+        width: 92px;
+        border-radius: 14px 14px 0 0;;
+        cursor: pointer;
+        font-family: "Gaegu", sans-serif;
+        font-size: 14px;
+    }
+
+    .character-tab.active {
+        background: #4b1fa6;
+    }
+
+    .character-tab:hover {
+        transform: translateY(-4px);
+    }
+    .character-image-frame,
     .character-image-frame.secondary {
-        width: 140px;
-        height: 100px;
+        width: 345px;
+        height: 160px;
     }
 
-    /* Images */
     .character-image-frame img {
         width: 100%;
         height: 100%;
     }
-    .character-content p {
-        font-size: 14px;
+
+    /* Dream Section fix */
+    .section-dream { 
+        overflow-y: visible;
+        overflow-x: hidden;
+    }
+    .bookmark-bar {
+        position: absolute;
+        padding-bottom: 30px;
+        top: -25px;
+        left: 28px;
+        display: flex;
+        flex-direction: row;
+        gap: 13px;
+        z-index: 10;
     }
 
-    .character-content h2 {
-        font-size: 14px;
-    }
-
-    .character-tabs {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    right: -40px;
-
-    }
-    .character-tab {
+    .bookmark-bar button{
         padding: 10px 14px;
-        width: 62px;
-        font-size: 14px;
+        width: 60px;
+        border-radius: 14px 14px 0 0;;
+        cursor: pointer;
+        font-family: "Gaegu", sans-serif;
+        font-size: 12px;
     }
 
-    /*Bear Customization Fix*/
-    .bear-preview {
-        width: 110px;
-        height: 110px;
-    }
-    .section-dream .dream-section {
-        padding-top: 8px;
-    }
-    .section-dream .bear-preview-wrapper {
-        margin-top: -20px;
-    }
-    .dream-title {
-        font-size: 13px;
-        margin-bottom: 10px;
-    }
-    .dream-subtitle {
-        font-size: 10px;
-        opacity: 0.85;
-        margin-top: -20px;
-    }
-    .bear-btn {
-    font-size: 14px;
-    font-family: "Gaegu", sans-serif;
+    .bookmark-bar.active { background: #4b1fa6; }
+
+    .bookmark-bar button:hover {
+        transform: translateY(-4px);
     }
 
-    .bear-bookmarks {
-        top: 10px;
-        left: 20%;
+    .dream-section h2{
+        font-size: 20px;
+        padding-top: 40px;
+    }
 
-    }
-    /*Profile section fix*/
-    .profile-btn {
-        padding: 5px 10px;
-        border: 2px solid #6a52a6;
-        border-radius: 10px;
-        transition: all 0.2s ease;
-    }
 }
