@@ -1,35 +1,35 @@
 const express = require("express");
-const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
+const { MongoClient } = require("mongodb");
 
 const app = express();
 const PORT = 3000;
 
-// Middleware
+/* ================== MONGODB SETUP ================== */
+const MONGO_URL = "mongodb://127.0.0.1:27017";
+const DB_NAME = "stuffedDB";
+
+let usersCollection;
+
+/* ================== MIDDLEWARE ================== */
 app.use(express.static("public")); // serve CSS, JS, images
-app.use(express.json()); // parse JSON in requests
+app.use(express.json()); // parse JSON body
 
-// Path to users.json
-const USERS_FILE = path.join(__dirname, "users.json");
+/* ================== CONNECT TO MONGODB ================== */
+MongoClient.connect(MONGO_URL)
+    .then(client => {
+        const db = client.db(DB_NAME);
+        usersCollection = db.collection("users");
+        console.log("✅ Connected to MongoDB");
+    })
+    .catch(err => {
+        console.error("❌ MongoDB connection error:", err);
+    });
 
-// Helper: read users, create file if missing
-function readUsers() {
-    if (!fs.existsSync(USERS_FILE)) {
-        fs.writeFileSync(USERS_FILE, "[]");
-    }
-    const data = fs.readFileSync(USERS_FILE);
-    return JSON.parse(data);
-}
+/* ================== API ROUTES ================== */
 
-// Helper: save users
-function saveUsers(users) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-}
-
-// ================== API ROUTES ==================
-
-// Sign Up
+// ---------- SIGN UP ----------
 app.post("/api/signup", async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -38,15 +38,18 @@ app.post("/api/signup", async (req, res) => {
             return res.status(400).json({ message: "Username and password required." });
         }
 
-        const users = readUsers();
-
-        if (users.find(u => u.username === username)) {
+        const existingUser = await usersCollection.findOne({ username });
+        if (existingUser) {
             return res.status(400).json({ message: "Username already exists." });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        users.push({ username, password: hashedPassword });
-        saveUsers(users);
+
+        await usersCollection.insertOne({
+            username,
+            password: hashedPassword,
+            bearState: null
+        });
 
         res.json({ message: "Sign up successful!" });
     } catch (err) {
@@ -55,18 +58,20 @@ app.post("/api/signup", async (req, res) => {
     }
 });
 
-// Log In
+// ---------- LOG IN ----------
 app.post("/api/login", async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        const users = readUsers();
-        const user = users.find(u => u.username === username);
-
-        if (!user) return res.status(400).json({ message: "Invalid username or password." });
+        const user = await usersCollection.findOne({ username });
+        if (!user) {
+            return res.status(400).json({ message: "Invalid username or password." });
+        }
 
         const valid = await bcrypt.compare(password, user.password);
-        if (!valid) return res.status(400).json({ message: "Invalid username or password." });
+        if (!valid) {
+            return res.status(400).json({ message: "Invalid username or password." });
+        }
 
         res.json({ message: "Login successful!", username });
     } catch (err) {
@@ -75,15 +80,13 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
-// Get user bear
-app.get("/api/me", (req, res) => {
-    const username = req.query.username; // frontend will send username
+// ---------- GET CURRENT USER ----------
+app.get("/api/me", async (req, res) => {
+    const username = req.query.username;
 
     if (!username) return res.json({ loggedIn: false });
 
-    const users = readUsers();
-    const user = users.find(u => u.username === username);
-
+    const user = await usersCollection.findOne({ username });
     if (!user) return res.json({ loggedIn: false });
 
     res.json({
@@ -93,34 +96,52 @@ app.get("/api/me", (req, res) => {
     });
 });
 
-
-app.post("/api/saveBear", (req, res) => {
+// ---------- SAVE BEAR ----------
+app.post("/api/saveBear", async (req, res) => {
     const { username, bearState } = req.body;
-    if (!username || !bearState) return res.status(400).json({ message: "Missing data" });
 
-    const users = readUsers();
-    const user = users.find(u => u.username === username);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    console.log("Received saveBear request body:", req.body); // debug
 
-    user.bearState = bearState;
-    saveUsers(users);
+    if (!username) {
+        return res.status(400).json({ message: "Missing username" });
+    }
 
-    res.json({ message: "Bear saved successfully" });
+    // Ensure bearState is always an object
+    const safeBearState = bearState && typeof bearState === "object" ? bearState : {};
+
+    try {
+        const result = await usersCollection.updateOne(
+            { username },
+            { $set: { bearState: safeBearState } }
+        );
+
+        console.log("Update result:", result);
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json({ message: "Bear saved successfully" });
+    } catch (err) {
+        console.error("Save bear error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
-// ================== SERVE SPA ==================
+
+/* ================== SERVE SPA ================== */
 
 // Serve Stuffed.html at root
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "Stuffed.html"));
 });
 
-// Fallback for unknown routes
+// Fallback
 app.use((req, res) => {
     res.status(404).send("Page not found");
 });
 
-// Start server
+/* ================== START SERVER ================== */
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
